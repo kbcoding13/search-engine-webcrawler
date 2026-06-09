@@ -51,3 +51,4 @@ class FrontQueue:
         url_list = sitemap_df[['loc', 'news_title', 'hours_since_publish', 'importance_score']].sort_values('importance_score', ascending=False).head(num)
         for u in url_list['loc']:
             self.queue.append(u)
+        

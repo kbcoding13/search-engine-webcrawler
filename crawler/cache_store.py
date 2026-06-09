@@ -39,8 +39,11 @@ class ContentStorage:
     
     def release_content(self):
         cache = self.session.execute(f"SELECT content, url FROM cache.names")
-        corpus = [c.content for c in cache]
-        return corpus
+        content = {}
+        for c in cache:
+            content[c.content] = c.url
+        return content
 
 cont = ContentStorage()
 print(cont.release_content())
+

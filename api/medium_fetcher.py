@@ -30,3 +30,4 @@ class MediumFetcher:
 med_fetch = MediumFetcher()
 po = med_fetch._get('https://medium.com/feed/@medium')
 print(po)
+

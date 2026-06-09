@@ -10,6 +10,7 @@ from crawler.url_seendetector import URLSeen
 import json
 
 from text_transformation.rank import Rank
+from text_transformation.query import QueryOutput
 
 # -- SEED URL --
 
@@ -30,6 +31,7 @@ filter = URLFilter()
 urlseen = URLSeen()
 
 ranker = Rank()
+query_output = QueryOutput()
 
 front_queue.priority_list(endpoint, 8)
 
@@ -78,5 +80,10 @@ for u in url_groups[back_queue.host(endpoint)]:
         else:
             print('The returned URL is not valid')
 
-    corpus = storage.release_content()
-    print(ranker.rank(corpus, "Liverpool"))
+    content = storage.release_content()
+    corpus = list(content)
+    
+    rank_dict = ranker.rank(corpus, "Liverpool")
+    rank_list = list(rank_dict)
+    
+    print(query_output.output(rank_list, content))
