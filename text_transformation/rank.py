@@ -19,9 +19,3 @@ class Rank:
             rankings[corpus[s]] = round(float(doc_scores[s]), 3)
 
         return rankings
-
-corpus = [
-    "apple pie recipe baking apples",
-    "apple apple apple apple apple banana fruit",
-    "how to bake a perfect apple pie for autumn holidays with cinnamon and crust"
-]

@@ -34,7 +34,13 @@ class ContentStorage:
                                         VALUES (%s, %s, %s, %s)""", (uuid.uuid4() ,url, parse, dt.datetime.now()))
 
     def release(self, url):
-        cache = self.session.execute(f"SELECT * FROM cache.names WHERE url = '{url}' ")
+        cache = self.session.execute(f"SELECT * FROM cache.names WHERE url = '{url}'")
         return cache
     
+    def release_content(self):
+        cache = self.session.execute(f"SELECT content, url FROM cache.names")
+        corpus = [c.content for c in cache]
+        return corpus
 
+cont = ContentStorage()
+print(cont.release_content())

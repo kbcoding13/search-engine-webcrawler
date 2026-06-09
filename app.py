@@ -1,14 +1,15 @@
-from .url_frontier import FrontQueue, BackQueue
-from .html_fetchrend import HTML_Fetcher
-from .html_parser import HTML_Parser
-from .dup_det import DuplicateDetection
-from .cache_store import ContentCache, ContentStorage
-from .kafka_store import KafkaProd, KafkaCons
-from .modular import ImageDownloader, AnaylticsService
-from .url_filter import URLFilter
-from .url_seendetector import URLSeen
+from crawler.url_frontier import FrontQueue, BackQueue
+from crawler.html_fetchrend import HTML_Fetcher
+from crawler.html_parser import HTML_Parser
+from crawler.dup_det import DuplicateDetection
+from crawler.cache_store import ContentCache, ContentStorage
+from crawler.kafka_store import KafkaProd, KafkaCons
+from crawler.modular import ImageDownloader, AnaylticsService
+from crawler.url_filter import URLFilter
+from crawler.url_seendetector import URLSeen
 import json
 
+from text_transformation.rank import Rank
 
 # -- SEED URL --
 
@@ -28,6 +29,7 @@ image_download = ImageDownloader()
 filter = URLFilter()
 urlseen = URLSeen()
 
+ranker = Rank()
 
 front_queue.priority_list(endpoint, 8)
 
@@ -74,6 +76,7 @@ for u in url_groups[back_queue.host(endpoint)]:
             else:
                 print('A new URL has been added to storage')
         else:
-            print('The returned URL is not valide')
+            print('The returned URL is not valid')
 
-    
+    corpus = storage.release_content()
+    print(ranker.rank(corpus, "Liverpool"))
