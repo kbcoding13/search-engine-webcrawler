@@ -12,6 +12,9 @@ import json
 from text_transformation.rank import Rank
 from text_transformation.query import QueryOutput
 
+from autocomplete.populate import Populate
+from autocomplete.trie import Trie
+
 # -- SEED URL --
 
 endpoint = 'https://www.bbc.com/sitemaps/https-index-com-news.xml'
@@ -32,6 +35,10 @@ urlseen = URLSeen()
 
 ranker = Rank()
 query_output = QueryOutput()
+
+populate = Populate()
+trie = Trie()
+
 
 front_queue.priority_list(endpoint, 8)
 
@@ -87,3 +94,10 @@ for u in url_groups[back_queue.host(endpoint)]:
     rank_list = list(rank_dict)
     
     print(query_output.output(rank_list, content))
+
+    for c in corpus:
+        tokens = populate.tokenize(c)
+        for t in tokens:
+            trie.insert(t)
+    
+    print(trie.search("Liv"))
