@@ -100,4 +100,5 @@ for u in url_groups[back_queue.host(endpoint)]:
         for t in tokens:
             trie.insert(t)
     
-    print(trie.search("Liv"))
+    search = (trie.search("Liv"))
+    print(query_output.paginate(search, 1, 5))
