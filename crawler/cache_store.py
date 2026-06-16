@@ -46,4 +46,3 @@ class ContentStorage:
 
 cont = ContentStorage()
 print(cont.release_content())
-

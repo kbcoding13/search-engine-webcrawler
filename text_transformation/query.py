@@ -42,4 +42,3 @@ print(query_output.check_time())
 print(query_output.check_time())
 print(query_output.check_time())
 print(query_output.check_time())
-

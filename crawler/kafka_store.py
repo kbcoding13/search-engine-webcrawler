@@ -1,5 +1,6 @@
 from kafka import KafkaProducer, KafkaConsumer, TopicPartition
 import json
+from autocomplete.populate import Populate
 
 class KafkaProd:
     def __init__(self):
@@ -20,4 +21,23 @@ class KafkaCons:
         for msg in self.consumer:
             print(msg)
 
-    
+class BackgroundIndexer:
+    def __init__(self, consumer, trie):
+        self.trie = trie
+        self.populate = Populate()
+        self.consumer = consumer
+
+    def index(self):
+        while True:
+            messages = self.consumer.poll(timeout_ms=10000)
+            for tp, records in messages.items():
+                for c in records:
+                    c_json = json.loads(c.value)
+                    tokens = self.populate.tokenize(c_json['content'])
+                    for t in tokens:
+                        self.trie.insert(t)
+
+
+# poll kafka for new messages and insert words onto trie
+
+

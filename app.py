@@ -3,7 +3,7 @@ from crawler.html_fetchrend import HTML_Fetcher
 from crawler.html_parser import HTML_Parser
 from crawler.dup_det import DuplicateDetection
 from crawler.cache_store import ContentCache, ContentStorage
-from crawler.kafka_store import KafkaProd, KafkaCons
+from crawler.kafka_store import KafkaProd, KafkaCons, BackgroundIndexer
 from crawler.modular import ImageDownloader, AnaylticsService
 from crawler.url_filter import URLFilter
 from crawler.url_seendetector import URLSeen
@@ -14,6 +14,9 @@ from text_transformation.query import QueryOutput
 
 from autocomplete.populate import Populate
 from autocomplete.trie import Trie
+
+import threading
+import time
 
 # -- SEED URL --
 
@@ -39,6 +42,7 @@ query_output = QueryOutput()
 populate = Populate()
 trie = Trie()
 
+background = BackgroundIndexer(consumer, trie)
 
 front_queue.priority_list(endpoint, 8)
 
@@ -56,6 +60,8 @@ url_groups = back_queue.url_groups
 
 for u in url_groups[back_queue.host(endpoint)]:
     result = fetcher.fetch(u)
+    if result is None:
+        continue
     parser = HTML_Parser(result)
     page = parser.page()[:200]
     dupe.check_exact(page)
@@ -75,7 +81,7 @@ for u in url_groups[back_queue.host(endpoint)]:
                     image_download.download(j, j.split('/')[-1])
     
     analytics = AnaylticsService(result, page, endpoint)
-    print(analytics.analysis)
+    #print(analytics.analysis)
 
     for p in parser.feed:
         if filter.is_valid(p):
@@ -102,4 +108,6 @@ for u in url_groups[back_queue.host(endpoint)]:
     
     search = (trie.search("Liv"))
     print(query_output.paginate(search, 1, 5))
-    
+
+    threading.Thread(target=background.index).start()
+
