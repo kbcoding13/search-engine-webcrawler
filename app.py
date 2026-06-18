@@ -17,6 +17,7 @@ from autocomplete.trie import Trie
 
 import threading
 import time
+import ast
 
 # -- SEED URL --
 
@@ -95,9 +96,16 @@ for u in url_groups[back_queue.host(endpoint)]:
 
     content = storage.release_content()
     corpus = list(content)
+
+    if cache.get_cache("Liverpool") is None:
+        rank_dict = ranker.rank(corpus, "Liverpool")
+        rank_list = str(list(rank_dict))
+        cache.set_cache("Liverpool", rank_list)
+    else:
+        string_list = cache.get_cache("Liverpool")
+        rank_list = ast.literal_eval(string_list)
     
-    rank_dict = ranker.rank(corpus, "Liverpool")
-    rank_list = list(rank_dict)
+
     
     print(query_output.output(rank_list, content))
 
@@ -109,5 +117,4 @@ for u in url_groups[back_queue.host(endpoint)]:
     search = (trie.search("Liv"))
     print(query_output.paginate(search, 1, 5))
 
-    threading.Thread(target=background.index).start()
-
+    threading.Thread(target=background.index, daemon=True).start()

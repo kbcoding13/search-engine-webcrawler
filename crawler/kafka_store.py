@@ -16,7 +16,7 @@ class KafkaProd:
 class KafkaCons:
     def __init__(self, group_id):
         self.consumer = KafkaConsumer('crawled_pages', group_id=group_id, auto_offset_reset='earliest')
-
+        
     def consume(self):
         for msg in self.consumer:
             print(msg)
@@ -29,7 +29,7 @@ class BackgroundIndexer:
 
     def index(self):
         while True:
-            messages = self.consumer.poll(timeout_ms=10000)
+            messages = self.consumer.consumer.poll(timeout_ms=10000)
             for tp, records in messages.items():
                 for c in records:
                     c_json = json.loads(c.value)
