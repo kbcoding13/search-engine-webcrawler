@@ -67,9 +67,7 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate
 # macOS/Linux: source .venv/bin/activate
 
-pip install requests beautifulsoup4 lxml advertools pandas numpy \
-    redis cassandra-driver kafka-python datasketch rank-bm25 nltk \
-    python-dotenv Wikipedia-API
+pip install -r requirements.txt
 ```
 
 ### 2. Download the NLTK data
