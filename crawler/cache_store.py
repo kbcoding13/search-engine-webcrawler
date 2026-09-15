@@ -2,6 +2,7 @@ import redis
 from cassandra.cluster import Cluster
 import datetime as dt
 import uuid
+from .shard import Shard
 
 class ContentCache:
     def __init__(self):
@@ -14,35 +15,34 @@ class ContentCache:
         return self.r.get(host)
     
 class ContentStorage:
-    def __init__(self):
-        self.perma_storage = {}
+    def __init__(self, num_shards=4):
+        self.shard = Shard(num_shards)
         try:
-            self.cluster = Cluster(['127.0.0.1']) 
+            self.cluster = Cluster(['127.0.0.1'])
             self.session = self.cluster.connect()
         except Exception as e:
             print(f"Connection failed: {e}")
         else:
             self.session.execute("""CREATE KEYSPACE IF NOT EXISTS cache
                                  WITH replication = {
-                                 'class': 'SimpleStrategy', 
+                                 'class': 'SimpleStrategy',
                                  'replication_factor': 1
                                  }""")
-            self.session.execute("CREATE TABLE IF NOT EXISTS cache.names ( cache_id uuid, url text, content text, crawled_at timestamp, PRIMARY KEY (cache_id))")
+            self.session.execute("CREATE TABLE IF NOT EXISTS cache.names ( shard_id int, cache_id uuid, url text, content text, crawled_at timestamp, PRIMARY KEY (shard_id, cache_id))")
 
     def store(self, url, parse):
-        self.row = self.session.execute(f"""INSERT INTO cache.names (cache_id, url, content, crawled_at)
-                                        VALUES (%s, %s, %s, %s)""", (uuid.uuid4() ,url, parse, dt.datetime.now()))
+        shard_id = self.shard.get_shard(url)
+        self.session.execute("""INSERT INTO cache.names (shard_id, cache_id, url, content, crawled_at)
+                                VALUES (%s, %s, %s, %s, %s)""", (shard_id, uuid.uuid4(), url, parse, dt.datetime.now()))
 
     def release(self, url):
-        cache = self.session.execute(f"SELECT * FROM cache.names WHERE url = '{url}'")
-        return cache
-    
-    def release_content(self):
-        cache = self.session.execute(f"SELECT content, url FROM cache.names")
-        content = {}
-        for c in cache:
-            content[c.content] = c.url
-        return content
+        shard_id = self.shard.get_shard(url)
+        return self.session.execute("SELECT * FROM cache.names WHERE shard_id = %s", (shard_id,))
 
-cont = ContentStorage()
-print(cont.release_content())
+    def release_content(self):
+        content = {}
+        for shard_id in range(self.shard.num_shards):
+            rows = self.session.execute("SELECT content, url FROM cache.names WHERE shard_id = %s", (shard_id,))
+            for c in rows:
+                content[c.content] = c.url
+        return content

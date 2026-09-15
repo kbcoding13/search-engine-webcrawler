@@ -21,7 +21,7 @@ class Trie:
 
         for char in prefix:
             if char not in current.children:
-                return False
+                return []
             current = current.children[char]
         self._collect(current, prefix, self.results)
         return self.results
@@ -34,7 +34,3 @@ class Trie:
             node = child_node
         return results
     
-trie = Trie()
-trie.insert("Liverpool")
-trie.insert("Liver")
-print(trie.search("Liv"))

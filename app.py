@@ -105,8 +105,6 @@ for u in url_groups[back_queue.host(endpoint)]:
         string_list = cache.get_cache("Liverpool")
         rank_list = ast.literal_eval(string_list)
     
-
-    
     print(query_output.output(rank_list, content))
 
     for c in corpus:

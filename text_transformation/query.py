@@ -26,19 +26,3 @@ class QueryOutput:
                 return 'request success'
         return f"too many requests, try again in {10 - seconds} seconds."
 
-query_output = QueryOutput()
-
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())
-print(query_output.check_time())

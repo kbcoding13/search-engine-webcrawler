@@ -1,6 +1,27 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
-images/
-*.tgz
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets
 .env
+.env.*
+!.env.example
+
+# Crawler output (images downloaded by ImageDownloader)
+images/
+
+# Archives (e.g. Kafka downloads)
+*.tgz
+*.tar.gz
+
+# Local tooling
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
